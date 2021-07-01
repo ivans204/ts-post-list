@@ -12,24 +12,50 @@ import { PostContext } from '../context/PostsContext';
 import PostItem from 'components/PostItem';
 
 const PostSingle: FC = () => {
-    const { postAuthor, postById, postComments } = useContext(PostContext);
+    const { posts, users, postAuthor, postById, postComments } =
+        useContext(PostContext);
 
     const { id } = useParams<{ id: string }>();
 
-    const post: IPost | undefined = postById(+id); // +id converts string id '1' to number id 1
-    const comments: IComment[] = postComments(+id);
-    const author: IUser | undefined = postAuthor(post?.userId);
+    // const post: IPost = postById(+id); // +id converts string id '1' to number id 1
+    // let comments: IComment[] = postComments(+id);
+    // let author: IUser = {} as IUser;
+
+    let post: IPost = {} as IPost; // +id converts string id '1' to number id 1
+    let comments: IComment[] = [];
+    let author: IUser = {} as IUser;
+
+    if (posts.length) {
+        post = postById(+id);
+        comments = postComments(+id);
+        console.log(post, 'post###############');
+
+        if (post.userId && users.length) {
+            console.log('e sad sam tu uso');
+
+            author = postAuthor(post.userId);
+            console.log(author);
+        }
+    }
 
     return (
-        <div>
-            <PostItem
-                title={post?.title}
-                body={post?.body}
-                comments={comments}
-                author={author?.username}
-            />
+        <>
+            {!posts.length && !comments.length && !author ? (
+                <h1>loading</h1>
+            ) : (
+                <PostItem
+                    title={post.title}
+                    body={post.body}
+                    comments={comments}
+                    author={author.username}
+                    // title=""
+                    // body=""
+                    // comments={[]}
+                    // author=""
+                />
+            )}
             <Link to="/posts"> Posts </Link>
-        </div>
+        </>
     );
 };
 

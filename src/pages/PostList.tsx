@@ -10,8 +10,7 @@ import { PostContext } from '../context/PostsContext';
 import PostItem from 'components/PostItem';
 
 const PostList: FC = () => {
-    const { posts, errorMsg, users, postAuthor, postComments } =
-        useContext(PostContext);
+    const { posts, users, postAuthor, postComments } = useContext(PostContext);
 
     const [searchValue, setSearchValue] = useState<string>('');
 
@@ -27,27 +26,33 @@ const PostList: FC = () => {
     const handleSearch = (e: ChangeEvent<HTMLInputElement>) =>
         setSearchValue(e.target.value.trim());
 
-    let author: IUser | undefined = undefined;
+    let author: IUser = {} as IUser;
     let comments: IComment[] = [];
 
     return (
         <div>
-            <input type="text" onChange={handleSearch} />
-            {errorMsg && <h1>{errorMsg}</h1>}
+            <label htmlFor="search">
+                Search
+                <input type="text" name="search" onChange={handleSearch} />
+            </label>
+
             {posts.length &&
                 filteredData.map(({ id, title, body, userId }) => {
                     author = postAuthor(userId);
                     comments = postComments(id);
 
                     return (
-                        <PostItem
-                            key={id}
-                            title={title}
-                            body={body}
-                            author={author?.username}
-                            comments={comments}
-                            href={`/post/${id}`}
-                        />
+                        !!author &&
+                        !!comments.length && (
+                            <PostItem
+                                key={id}
+                                title={title}
+                                body={body}
+                                author={author.username}
+                                comments={comments}
+                                href={`/post/${id}`}
+                            />
+                        )
                     );
                 })}
         </div>

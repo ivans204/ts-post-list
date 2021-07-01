@@ -3,63 +3,101 @@ import { createContext, useEffect, useState, FC } from 'react';
 import { IComment } from '../models/comment.model';
 import { IPost } from '../models/post.model';
 import { IUser } from '../models/user.model';
-import { ContextType } from '../models/context.model';
+import { PostContextType } from '../models/context.model';
 
 import { getPosts, getComments, getUsers } from '../api/api';
 
-export const PostContext = createContext<ContextType>({} as ContextType);
+export const PostContext = createContext<PostContextType>(
+    {} as PostContextType
+);
 
 const PostContextProvider: FC = ({ children }) => {
-    const [errorMsg, setErrorMsg] = useState<string>('');
+    const [error, setError] = useState<boolean>(false);
     const [comments, setComments] = useState<IComment[]>([]);
     const [posts, setPosts] = useState<IPost[]>([]);
     const [users, setUsers] = useState<IUser[]>([]);
+    const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+    const [isLoadingComments, setIsLoadingComments] = useState(false);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
-    const postById = (id: number): IPost | undefined =>
-        posts.find((post) => post.id === id);
+    const isDone = !isLoadingPosts && !isLoadingComments && !isLoadingUsers;
 
-    const postComments = (postId: number): IComment[] =>
+    const getPostById = (id: number): IPost =>
+        posts.find((post) => post.id === id) as IPost;
+
+    const getPostComments = (postId: number): IComment[] =>
         comments.filter((comment) => comment.postId === postId);
 
-    const postAuthor = (postUserId: number | undefined): IUser | undefined =>
-        users.find((user) => user.id === postUserId);
+    const getPostAuthor = (postUserId: number): IUser =>
+        users.find((user) => user.id === postUserId) as IUser;
 
     useEffect(() => {
         getPosts()
             .then((posts) => setPosts(posts))
-            .catch(() => setErrorMsg('Wrong Url'));
+            .catch(() => setError(true))
+            .finally(() => setIsLoadingPosts(false));
 
         getComments()
             .then((comments) => setComments(comments))
-            .catch(() => setErrorMsg('Wrong Url'));
+            .catch(() => setError(true))
+            .finally(() => setIsLoadingComments(false));
 
         getUsers()
             .then((users) => setUsers(users))
-            .catch(() => setErrorMsg('Something went wrong :('));
+            .catch(() => setError(true))
+            .finally(() => setIsLoadingUsers(false));
+
+        // console.log(isDone);
 
         // eslint-disable-next-line
     }, []);
 
-    return (
-        <>
-            {!!errorMsg && <h1>{errorMsg}</h1>}
-            {!!posts.length && (
-                <PostContext.Provider
-                    value={{
-                        errorMsg,
-                        comments,
-                        posts,
-                        users,
-                        postById,
-                        postComments,
-                        postAuthor,
-                    }}
-                >
-                    {children}
-                </PostContext.Provider>
-            )}
-        </>
-    );
+    if (error) {
+        return <h1>Erorr</h1>;
+    } else if (!isDone) {
+        return <h1>loading</h1>;
+    } else {
+        return (
+            <PostContext.Provider
+                value={{
+                    error,
+                    comments,
+                    posts,
+                    users,
+                    postById: getPostById,
+                    postComments: getPostComments,
+                    postAuthor: getPostAuthor,
+                }}
+            >
+                {children}
+            </PostContext.Provider>
+        );
+    }
+    // {
+    /* return (
+            <>
+                {error ? (
+                    <h1>Somethong went wrong</h1>
+                ) : isDone ? (
+                    <PostContext.Provider
+                        value={{
+                            error,
+                            comments,
+                            posts,
+                            users,
+                            postById: getPostById,
+                            postComments: getPostComments,
+                            postAuthor: getPostAuthor,
+                        }}
+                    >
+                        {children}
+                    </PostContext.Provider>
+                ) : (
+                    <h1>is loading</h1>
+                )}
+            </>
+        ); */
+    // }
 };
 
 export default PostContextProvider;
