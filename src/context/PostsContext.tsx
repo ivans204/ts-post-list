@@ -1,103 +1,81 @@
-import { createContext, useEffect, useState, FC } from 'react';
+import { createContext, useReducer, FC } from 'react';
 
 import { IComment } from '../models/comment.model';
 import { IPost } from '../models/post.model';
 import { IUser } from '../models/user.model';
+
+import { PostActions } from '../models/context.model';
+
 import { PostContextType } from '../models/context.model';
 
-import { getPosts, getComments, getUsers } from '../api/api';
+import { Types } from '../models/context.model';
 
-export const PostContext = createContext<PostContextType>(
-    {} as PostContextType
-);
+type initialStateType = {
+    posts: IPost[];
+    comments: IComment[];
+    users: IUser[];
+};
+
+const initialState = {
+    posts: [],
+    comments: [],
+    users: [],
+    activePost: {},
+    activePostComments: [],
+    activePostAuthor: {},
+};
+
+export const PostContext = createContext<PostContextType>({
+    state: initialState,
+    dispatch: () => {},
+});
+
+// const getPostById = (id) => {
+//     return {
+//         type: "GET_POST_BY_ID",
+//         value:
+//     }
+// }
+
+export const postReducer = (state: initialStateType, action: PostActions) => {
+    switch (action.type) {
+        case Types.Posts:
+            return { ...state, posts: action.payload };
+        case Types.Comments:
+            return { ...state, comments: action.payload };
+        case Types.Users:
+            return { ...state, users: action.payload };
+        // case Types.GetPostById:
+        //     return;
+        default:
+            return state;
+    }
+};
 
 const PostContextProvider: FC = ({ children }) => {
-    const [error, setError] = useState<boolean>(false);
-    const [comments, setComments] = useState<IComment[]>([]);
-    const [posts, setPosts] = useState<IPost[]>([]);
-    const [users, setUsers] = useState<IUser[]>([]);
-    const [isLoadingPosts, setIsLoadingPosts] = useState(false);
-    const [isLoadingComments, setIsLoadingComments] = useState(false);
-    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+    const [state, dispatch] = useReducer(postReducer, initialState);
 
-    const isDone = !isLoadingPosts && !isLoadingComments && !isLoadingUsers;
+    // const getPostById = (id: number): IPost =>
+    //     state.posts.find((post) => post.id === id) as IPost;
 
-    const getPostById = (id: number): IPost =>
-        posts.find((post) => post.id === id) as IPost;
+    // const getPostComments = (postId: number): IComment[] =>
+    //     state.comments.filter((comment) => comment.postId === postId);
 
-    const getPostComments = (postId: number): IComment[] =>
-        comments.filter((comment) => comment.postId === postId);
+    // const getPostAuthor = (postUserId: number): IUser =>
+    //     state.users.find((user) => user.id === postUserId) as IUser;
 
-    const getPostAuthor = (postUserId: number): IUser =>
-        users.find((user) => user.id === postUserId) as IUser;
+    // jel takvu neku manipulaciju pisem tu ili u reducer?
 
-    useEffect(() => {
-        getPosts()
-            .then((posts) => setPosts(posts))
-            .catch(() => setError(true))
-            .finally(() => setIsLoadingPosts(false));
-
-        getComments()
-            .then((comments) => setComments(comments))
-            .catch(() => setError(true))
-            .finally(() => setIsLoadingComments(false));
-
-        getUsers()
-            .then((users) => setUsers(users))
-            .catch(() => setError(true))
-            .finally(() => setIsLoadingUsers(false));
-
-        // console.log(isDone);
-
-        // eslint-disable-next-line
-    }, []);
-
-    if (error) {
-        return <h1>Erorr</h1>;
-    } else if (!isDone) {
-        return <h1>loading</h1>;
-    } else {
-        return (
-            <PostContext.Provider
-                value={{
-                    error,
-                    comments,
-                    posts,
-                    users,
-                    postById: getPostById,
-                    postComments: getPostComments,
-                    postAuthor: getPostAuthor,
-                }}
-            >
-                {children}
-            </PostContext.Provider>
-        );
-    }
-    // {
-    /* return (
-            <>
-                {error ? (
-                    <h1>Somethong went wrong</h1>
-                ) : isDone ? (
-                    <PostContext.Provider
-                        value={{
-                            error,
-                            comments,
-                            posts,
-                            users,
-                            postById: getPostById,
-                            postComments: getPostComments,
-                            postAuthor: getPostAuthor,
-                        }}
-                    >
-                        {children}
-                    </PostContext.Provider>
-                ) : (
-                    <h1>is loading</h1>
-                )}
-            </>
-        ); */
-    // }
+    return (
+        <PostContext.Provider
+            value={{
+                state,
+                dispatch,
+            }}
+        >
+            {children}
+        </PostContext.Provider>
+    );
 };
 
 export default PostContextProvider;

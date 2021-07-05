@@ -1,8 +1,12 @@
-import { useState, useContext, FC, ChangeEvent } from 'react';
+import { useContext, FC, useEffect } from 'react';
+
+import useFetch from 'hooks/useFetch';
 
 import { IComment } from '../models/comment.model';
 import { IUser } from '../models/user.model';
 import { IPost } from '../models/post.model';
+
+import { Types } from '../models/context.model';
 
 import withMessage from '../hocs/withMessage';
 
@@ -10,52 +14,76 @@ import { PostContext } from '../context/PostsContext';
 import PostItem from 'components/PostItem';
 
 const PostList: FC = () => {
-    const { posts, users, postAuthor, postComments } = useContext(PostContext);
+    const { state, dispatch } = useContext(PostContext);
+    const posts = useFetch('https://jsonplaceholder.typicode.com/posts');
+    const comments = useFetch('https://jsonplaceholder.typicode.com/comments');
+    const users = useFetch('https://jsonplaceholder.typicode.com/users');
 
-    const [searchValue, setSearchValue] = useState<string>('');
+    useEffect(() => {
+        if (!state.posts.length && posts.status === 'fetched') {
+            console.log('udem ipak tu');
 
-    const filteredUsers: IUser[] = users.filter((user) =>
-        user.username.toLowerCase().includes(searchValue.toLowerCase())
-    );
+            dispatch({
+                type: Types.Posts,
+                payload: posts.data as IPost[],
+            });
+        }
 
-    const filteredData: IPost[] = posts.filter((post) => {
-        if (!searchValue) return post;
-        return filteredUsers.find((user) => post.userId === user.id);
+        if (!state.comments.length && comments.status === 'fetched') {
+            console.log('udem ipak tu');
+
+            dispatch({
+                type: Types.Comments,
+                payload: comments.data as IComment[],
+            });
+        }
+
+        if (!state.users.length && users.status === 'fetched') {
+            console.log('udem ipak tu');
+
+            dispatch({
+                type: Types.Users,
+                payload: users.data as IUser[],
+            });
+        }
+
+        // eslint-disable-next-line
     });
 
-    const handleSearch = (e: ChangeEvent<HTMLInputElement>) =>
-        setSearchValue(e.target.value.trim());
+    const postComments = (id: number) =>
+        state.comments.filter((comment) => comment.postId === id);
 
-    let author: IUser = {} as IUser;
-    let comments: IComment[] = [];
+    const postAuthor = (userId: number): IUser => {
+        return state.users.find((user) => user.id === userId) as IUser;
+    };
+
+    if (
+        posts.status === 'init' ||
+        posts.status === 'fetching' ||
+        comments.status === 'init' ||
+        comments.status === 'fetching' ||
+        users.status === 'init' ||
+        users.status === 'fetching'
+    )
+        return <h1>Loading...</h1>;
+
+    if (posts.error) return <h1>{posts.error}</h1>;
 
     return (
-        <div>
-            <label htmlFor="search">
-                Search
-                <input type="text" name="search" onChange={handleSearch} />
-            </label>
-
-            {posts.length &&
-                filteredData.map(({ id, title, body, userId }) => {
-                    author = postAuthor(userId);
-                    comments = postComments(id);
-
-                    return (
-                        !!author &&
-                        !!comments.length && (
-                            <PostItem
-                                key={id}
-                                title={title}
-                                body={body}
-                                author={author.username}
-                                comments={comments}
-                                href={`/post/${id}`}
-                            />
-                        )
-                    );
-                })}
-        </div>
+        <>
+            {state.posts.map(({ id, title, body, userId }) => {
+                return (
+                    <PostItem
+                        key={id}
+                        title={title}
+                        body={body}
+                        href={`/post/${id}`}
+                        comments={postComments(id)}
+                        author={postAuthor(userId).username}
+                    />
+                );
+            })}
+        </>
     );
 };
 
