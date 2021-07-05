@@ -55,7 +55,10 @@ const PostList: FC = () => {
         state.comments.filter((comment) => comment.postId === id);
 
     const postAuthor = (userId: number): IUser => {
-        return state.users.find((user) => user.id === userId) as IUser;
+        return (
+            state.posts &&
+            (state.users.find((user) => user.id === userId) as IUser)
+        );
     };
 
     if (
@@ -77,7 +80,7 @@ const PostList: FC = () => {
                         body={body}
                         href={`/post/${id}`}
                         comments={postComments(id)}
-                        author={postAuthor(userId).username}
+                        author={postAuthor(userId)?.username}
                     />
                 );
             })}
