@@ -1,5 +1,5 @@
 export interface State<T> {
-    status: 'init' | 'fetching' | 'error' | 'fetched';
+    status: 'fetching' | 'error' | 'fetched' | undefined;
     data?: T;
     error?: string;
 }

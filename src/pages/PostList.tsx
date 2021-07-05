@@ -15,14 +15,19 @@ import PostItem from 'components/PostItem';
 
 const PostList: FC = () => {
     const { state, dispatch } = useContext(PostContext);
-    const posts = useFetch('https://jsonplaceholder.typicode.com/posts');
-    const comments = useFetch('https://jsonplaceholder.typicode.com/comments');
-    const users = useFetch('https://jsonplaceholder.typicode.com/users');
+
+    const posts = useFetch('https://jsonplaceholder.typicode.com/posts', {
+        shouldFetch: !state.posts.length,
+    });
+    const comments = useFetch('https://jsonplaceholder.typicode.com/comments', {
+        shouldFetch: !state.comments.length,
+    });
+    const users = useFetch('https://jsonplaceholder.typicode.com/users', {
+        shouldFetch: !state.users.length,
+    });
 
     useEffect(() => {
         if (!state.posts.length && posts.status === 'fetched') {
-            console.log('udem ipak tu');
-
             dispatch({
                 type: Types.Posts,
                 payload: posts.data as IPost[],
@@ -30,8 +35,6 @@ const PostList: FC = () => {
         }
 
         if (!state.comments.length && comments.status === 'fetched') {
-            console.log('udem ipak tu');
-
             dispatch({
                 type: Types.Comments,
                 payload: comments.data as IComment[],
@@ -39,8 +42,6 @@ const PostList: FC = () => {
         }
 
         if (!state.users.length && users.status === 'fetched') {
-            console.log('udem ipak tu');
-
             dispatch({
                 type: Types.Users,
                 payload: users.data as IUser[],
@@ -58,11 +59,8 @@ const PostList: FC = () => {
     };
 
     if (
-        posts.status === 'init' ||
         posts.status === 'fetching' ||
-        comments.status === 'init' ||
         comments.status === 'fetching' ||
-        users.status === 'init' ||
         users.status === 'fetching'
     )
         return <h1>Loading...</h1>;

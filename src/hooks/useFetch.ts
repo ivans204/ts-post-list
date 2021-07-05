@@ -5,15 +5,19 @@ import { fetchReducer } from 'reducers/useFetch.reducer';
 
 import { State, Cache } from '../models/useFetch.model';
 
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+    shouldFetch: boolean;
+}
+
 const useFetch = <T = unknown>(
-    url?: string,
-    options?: AxiosRequestConfig
+    url: string,
+    options: CustomAxiosRequestConfig = { shouldFetch: true }
 ): State<T> => {
     const cancelRequest = useRef<boolean>(false);
     const cache = useRef<Cache<T>>({});
 
     const initialState: State<T> = {
-        status: 'init',
+        status: undefined,
         error: undefined,
         data: undefined,
     };
@@ -21,10 +25,6 @@ const useFetch = <T = unknown>(
     const [state, dispatch] = useReducer(fetchReducer, initialState);
 
     useEffect(() => {
-        if (!url) {
-            return;
-        }
-
         const fetchData = async () => {
             dispatch({ type: 'request' });
 
@@ -46,7 +46,7 @@ const useFetch = <T = unknown>(
             }
         };
 
-        fetchData();
+        if (options.shouldFetch) fetchData();
 
         return () => {
             cancelRequest.current = true;

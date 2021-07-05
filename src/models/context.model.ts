@@ -8,7 +8,6 @@ export enum Types {
     Posts = 'SET_POSTS',
     Comments = 'SET_COMMENTS',
     Users = 'SET_USERS',
-    GetPostById = 'GET_POST_BY_ID',
 }
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -26,7 +25,6 @@ type PostPayload = {
     [Types.Posts]: IPost[];
     [Types.Comments]: IComment[];
     [Types.Users]: IUser[];
-    [Types.GetPostById]: IPost;
 };
 
 export type PostActions = ActionMap<PostPayload>[keyof ActionMap<PostPayload>];

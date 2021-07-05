@@ -32,8 +32,7 @@ const PostSingle: FC = () => {
         //eslint-disable-next-line
     });
 
-    if (posts.status === 'init' || posts.status === 'fetching')
-        return <h1>Loading...</h1>;
+    if (posts.status === 'fetching') return <h1>Loading...</h1>;
 
     return (
         <>
