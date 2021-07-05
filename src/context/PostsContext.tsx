@@ -30,11 +30,11 @@ export const PostContext = createContext<PostContextType>({
 
 export const postReducer = (state: initialStateType, action: PostActions) => {
     switch (action.type) {
-        case Types.Posts:
+        case Types.SET_POSTS:
             return { ...state, posts: action.payload };
-        case Types.Comments:
+        case Types.SET_COMMENTS:
             return { ...state, comments: action.payload };
-        case Types.Users:
+        case Types.SET_USERS:
             return { ...state, users: action.payload };
         default:
             return state;

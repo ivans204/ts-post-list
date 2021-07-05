@@ -5,9 +5,9 @@ import { IComment } from './comment.model';
 import { IUser } from './user.model';
 
 export enum Types {
-    Posts = 'SET_POSTS',
-    Comments = 'SET_COMMENTS',
-    Users = 'SET_USERS',
+    SET_POSTS = 'SET_POSTS',
+    SET_COMMENTS = 'SET_COMMENTS',
+    SET_USERS = 'SET_USERS',
 }
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -22,9 +22,9 @@ type ActionMap<M extends { [index: string]: any }> = {
 };
 
 type PostPayload = {
-    [Types.Posts]: IPost[];
-    [Types.Comments]: IComment[];
-    [Types.Users]: IUser[];
+    [Types.SET_POSTS]: IPost[];
+    [Types.SET_COMMENTS]: IComment[];
+    [Types.SET_USERS]: IUser[];
 };
 
 export type PostActions = ActionMap<PostPayload>[keyof ActionMap<PostPayload>];

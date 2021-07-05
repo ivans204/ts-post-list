@@ -24,7 +24,7 @@ const PostSingle: FC = () => {
     useEffect(() => {
         if (!state.posts.length && posts.status === 'fetched') {
             dispatch({
-                type: Types.Posts,
+                type: Types.SET_POSTS,
                 payload: posts.data as IPost[],
             });
         }
