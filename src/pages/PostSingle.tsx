@@ -1,11 +1,11 @@
 import { FC, useContext, useEffect } from 'react';
-// import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 import useFetch from '../hooks/useFetch';
 
 // import { IComment } from '../models/comment.model';
-import { IPost } from '../models/post.model';
+// import { IPost } from '../models/post.model';
 // import { IUser } from '../models/user.model';
 import { Types } from '../models/context.model';
 
@@ -17,22 +17,25 @@ import PostItem from 'components/PostItem';
 const PostSingle: FC = () => {
     let { state, dispatch } = useContext(PostContext);
 
-    const posts = useFetch('https://jsonplaceholder.typicode.com/posts');
+    const { id } = useParams<{ id: string }>();
 
-    // const { id } = useParams<{ id: string }>();
+    const selectedPost = useFetch(
+        `https://jsonplaceholder.typicode.com/posts/${id}`
+    );
 
     useEffect(() => {
-        if (!state.posts.length && posts.status === 'fetched') {
-            dispatch({
-                type: Types.SET_POSTS,
-                payload: posts.data as IPost[],
-            });
+        if (!state.posts.length && selectedPost.status === 'fetched') {
+            // dispatch({
+            //     type: Types.SET_SELECTED_POST,
+            //     payload: id,
+            // });
+            console.log(123);
         }
 
         //eslint-disable-next-line
-    });
+    }, []);
 
-    if (posts.status === 'fetching') return <h1>Loading...</h1>;
+    if (selectedPost.status === 'fetching') return <h1>Loading...</h1>;
 
     return (
         <>

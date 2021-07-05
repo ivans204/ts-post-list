@@ -1,45 +1,27 @@
 import { createContext, useReducer, FC } from 'react';
 
-import { IComment } from '../models/comment.model';
+import { postReducer } from 'reducers/post.reducer';
+
+import { PostContextType, State } from '../models/context.model';
+
 import { IPost } from '../models/post.model';
 import { IUser } from '../models/user.model';
 
-import { PostActions } from '../models/context.model';
-
-import { PostContextType } from '../models/context.model';
-
-import { Types } from '../models/context.model';
-
-type initialStateType = {
-    posts: IPost[];
-    comments: IComment[];
-    users: IUser[];
-};
-
-const initialState = {
+const initialState: State = {
     posts: [],
     comments: [],
     users: [],
-    selectedPost: { comments: [], author: {} },
+    selectedPost: {
+        post: {} as IPost,
+        // comments: [],
+        // author: {} as IUser,
+    },
 };
 
 export const PostContext = createContext<PostContextType>({
     state: initialState,
     dispatch: () => {},
 });
-
-export const postReducer = (state: initialStateType, action: PostActions) => {
-    switch (action.type) {
-        case Types.SET_POSTS:
-            return { ...state, posts: action.payload };
-        case Types.SET_COMMENTS:
-            return { ...state, comments: action.payload };
-        case Types.SET_USERS:
-            return { ...state, users: action.payload };
-        default:
-            return state;
-    }
-};
 
 const PostContextProvider: FC = ({ children }) => {
     const [state, dispatch] = useReducer(postReducer, initialState);
