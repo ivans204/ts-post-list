@@ -45,6 +45,26 @@ export const postReducer = (state: State, action: PostActions) => {
                     comments: action.payload,
                 },
             };
+
+        case Types.SET_SELECTED_USER:
+            if (typeof action.payload === 'number') {
+                return {
+                    ...state,
+                    selectedPost: {
+                        ...state.selectedPost,
+                        author: state.users.find(
+                            (stateUser) => stateUser.id === action.payload
+                        ),
+                    },
+                };
+            }
+            return {
+                ...state,
+                selectedPost: {
+                    ...state.selectedPost,
+                    author: action.payload,
+                },
+            };
         default:
             return state;
     }

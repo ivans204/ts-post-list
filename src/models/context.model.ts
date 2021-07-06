@@ -10,7 +10,7 @@ export enum Types {
     SET_USERS = 'SET_USERS',
     SET_SELECTED_POST = 'SET_SELECTED_POST',
     SET_SELECTED_COMMENTS = 'SET_SELECTED_COMMENTS',
-    // SET_SELECTED_USER = 'SET_SELECTED_USER',
+    SET_SELECTED_USER = 'SET_SELECTED_USER',
 }
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -30,7 +30,7 @@ type PostPayload = {
     [Types.SET_USERS]: IUser[];
     [Types.SET_SELECTED_POST]: IPost | number;
     [Types.SET_SELECTED_COMMENTS]: IComment[] | number;
-    // [Types.SET_SELECTED_USER]: number;
+    [Types.SET_SELECTED_USER]: IUser | number | undefined;
 };
 
 export type PostActions = ActionMap<PostPayload>[keyof ActionMap<PostPayload>];
@@ -41,8 +41,8 @@ export type State = {
     users: IUser[];
     selectedPost: {
         post?: IPost;
-        comments?: IComment[];
-        // author: IUser;
+        comments: IComment[];
+        author?: IUser;
     };
 };
 

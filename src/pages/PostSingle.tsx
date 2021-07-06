@@ -6,7 +6,7 @@ import useFetch from '../hooks/useFetch';
 
 import { IComment } from '../models/comment.model';
 import { IPost } from '../models/post.model';
-// import { IUser } from '../models/user.model';
+import { IUser } from '../models/user.model';
 import { Types } from '../models/context.model';
 
 import withMessage from 'hocs/withMessage';
@@ -29,6 +29,13 @@ const PostSingle: FC = () => {
         { shouldFetch: !state.comments.length }
     );
 
+    const fetchedUser = useFetch(
+        `https://jsonplaceholder.typicode.com/users/${state.selectedPost.post?.userId}`,
+        {
+            shouldFetch: fetchedPost.status === 'success',
+        }
+    );
+
     useEffect(() => {
         if (
             !state.selectedPost.post?.body &&
@@ -41,12 +48,23 @@ const PostSingle: FC = () => {
         }
 
         if (
-            !state.selectedPost.comments?.length &&
+            !state.selectedPost.comments.length &&
             fetchedComments.status === 'success'
         ) {
             dispatch({
                 type: Types.SET_SELECTED_COMMENTS,
                 payload: fetchedComments.data as IComment[],
+            });
+        }
+
+        if (
+            !state.selectedPost.author?.username &&
+            // state.selectedPost.post.userId &&
+            fetchedUser.status === 'success'
+        ) {
+            dispatch({
+                type: Types.SET_SELECTED_USER,
+                payload: fetchedUser.data as IUser,
             });
         }
 
@@ -59,6 +77,14 @@ const PostSingle: FC = () => {
 
         if (state.comments.length)
             dispatch({ type: Types.SET_SELECTED_COMMENTS, payload: +id });
+
+        console.log(state.selectedPost.post?.userId);
+
+        if (state.users.length && state.selectedPost.post?.userId)
+            dispatch({
+                type: Types.SET_SELECTED_USER,
+                payload: state.selectedPost.post?.userId,
+            });
         //eslint-disable-next-line
     }, []);
 
@@ -74,8 +100,7 @@ const PostSingle: FC = () => {
                 title={state.selectedPost.post?.title}
                 body={state.selectedPost.post?.body}
                 comments={state.selectedPost.comments}
-                // author={author?.username}
-                author="author"
+                author={state.selectedPost.author?.username || 'author'}
             />
             <Link to="/posts"> Posts </Link>
         </>
