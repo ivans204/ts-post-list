@@ -28,9 +28,9 @@ type PostPayload = {
     [Types.SET_POSTS]: IPost[];
     [Types.SET_COMMENTS]: IComment[];
     [Types.SET_USERS]: IUser[];
-    [Types.SET_SELECTED_POST]: number | string;
-    // [Types.SET_SELECTED_COMMENTS]: number | string;
-    // [Types.SET_SELECTED_USER]: number | string;
+    [Types.SET_SELECTED_POST]: IPost | number;
+    // [Types.SET_SELECTED_COMMENTS]: number;
+    // [Types.SET_SELECTED_USER]: number;
 };
 
 export type PostActions = ActionMap<PostPayload>[keyof ActionMap<PostPayload>];
@@ -40,7 +40,7 @@ export type State = {
     comments: IComment[];
     users: IUser[];
     selectedPost: {
-        post: IPost | undefined;
+        post?: IPost;
         // comments: IComment[];
         // author: IUser;
     };

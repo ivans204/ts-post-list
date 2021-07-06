@@ -27,21 +27,21 @@ const PostList: FC = () => {
     });
 
     useEffect(() => {
-        if (!state.posts.length && posts.status === 'fetched') {
+        if (!state.posts.length && posts.status === 'success') {
             dispatch({
                 type: Types.SET_POSTS,
                 payload: posts.data as IPost[],
             });
         }
 
-        if (!state.comments.length && comments.status === 'fetched') {
+        if (!state.comments.length && comments.status === 'success') {
             dispatch({
                 type: Types.SET_COMMENTS,
                 payload: comments.data as IComment[],
             });
         }
 
-        if (!state.users.length && users.status === 'fetched') {
+        if (!state.users.length && users.status === 'success') {
             dispatch({
                 type: Types.SET_USERS,
                 payload: users.data as IUser[],

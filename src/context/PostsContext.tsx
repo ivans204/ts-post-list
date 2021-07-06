@@ -5,7 +5,7 @@ import { postReducer } from 'reducers/post.reducer';
 import { PostContextType, State } from '../models/context.model';
 
 import { IPost } from '../models/post.model';
-import { IUser } from '../models/user.model';
+// import { IUser } from '../models/user.model';
 
 const initialState: State = {
     posts: [],

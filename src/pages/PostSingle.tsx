@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import useFetch from '../hooks/useFetch';
 
 // import { IComment } from '../models/comment.model';
-// import { IPost } from '../models/post.model';
+import { IPost } from '../models/post.model';
 // import { IUser } from '../models/user.model';
 import { Types } from '../models/context.model';
 
@@ -17,37 +17,47 @@ import PostItem from 'components/PostItem';
 const PostSingle: FC = () => {
     let { state, dispatch } = useContext(PostContext);
 
+    // const { posts } = state;
+
     const { id } = useParams<{ id: string }>();
 
-    const selectedPost = useFetch(
-        `https://jsonplaceholder.typicode.com/posts/${id}`
+    const fetchedPost = useFetch(
+        `https://jsonplaceholder.typicode.com/posts/${id}`,
+        { shouldFetch: !state.posts.length }
     );
 
     useEffect(() => {
-        if (!state.posts.length && selectedPost.status === 'fetched') {
-            // dispatch({
-            //     type: Types.SET_SELECTED_POST,
-            //     payload: id,
-            // });
-            console.log(123);
+        if (
+            !state.selectedPost.post?.body &&
+            fetchedPost.status === 'success'
+        ) {
+            dispatch({
+                type: Types.SET_SELECTED_POST,
+                payload: fetchedPost.data as IPost,
+            });
         }
+        //eslint-disable-next-line
+    });
 
+    useEffect(() => {
+        if (state.posts.length)
+            dispatch({ type: Types.SET_SELECTED_POST, payload: +id });
         //eslint-disable-next-line
     }, []);
 
-    if (selectedPost.status === 'fetching') return <h1>Loading...</h1>;
+    if (fetchedPost.status === 'fetching') return <h1>Loading...</h1>;
 
     return (
         <>
             <PostItem
-                // title={post.data?.title}
-                // body={post.data?.body}
+                title={state.selectedPost.post?.title}
+                body={state.selectedPost.post?.body}
                 // comments={comments.data}
                 // author={author?.username}
-                title="title"
-                body="body"
+                // title="title"
+                // body="body"
                 comments={[]}
-                author="autor"
+                author="author"
             />
             <Link to="/posts"> Posts </Link>
         </>

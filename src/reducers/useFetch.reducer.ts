@@ -10,7 +10,7 @@ export const fetchReducer = <T>(
         case 'success':
             return {
                 ...state,
-                status: 'fetched',
+                status: 'success',
                 data: action.payload,
             };
         case 'failure':
