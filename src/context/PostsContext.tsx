@@ -13,7 +13,7 @@ const initialState: State = {
     users: [],
     selectedPost: {
         post: {} as IPost,
-        // comments: [],
+        comments: [],
         // author: {} as IUser,
     },
 };

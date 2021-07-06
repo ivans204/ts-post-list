@@ -13,13 +13,38 @@ export const postReducer = (state: State, action: PostActions) => {
                 return {
                     ...state,
                     selectedPost: {
+                        ...state.selectedPost,
                         post: state.posts.find(
                             (statePost) => statePost.id === action.payload
                         ),
                     },
                 };
             }
-            return { ...state, selectedPost: { post: action.payload } };
+            return {
+                ...state,
+                selectedPost: { ...state.selectedPost, post: action.payload },
+            };
+
+        case Types.SET_SELECTED_COMMENTS:
+            if (typeof action.payload === 'number') {
+                return {
+                    ...state,
+                    selectedPost: {
+                        ...state.selectedPost,
+                        comments: state.comments.filter(
+                            (stateComment) =>
+                                stateComment.postId === action.payload
+                        ),
+                    },
+                };
+            }
+            return {
+                ...state,
+                selectedPost: {
+                    ...state.selectedPost,
+                    comments: action.payload,
+                },
+            };
         default:
             return state;
     }

@@ -68,7 +68,8 @@ const PostList: FC = () => {
     )
         return <h1>Loading...</h1>;
 
-    if (posts.error) return <h1>{posts.error}</h1>;
+    if (posts.error || comments.error || users.error)
+        return <h1>{posts.error || comments.error || users.error}</h1>;
 
     return (
         <>

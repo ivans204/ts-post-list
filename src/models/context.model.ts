@@ -9,7 +9,7 @@ export enum Types {
     SET_COMMENTS = 'SET_COMMENTS',
     SET_USERS = 'SET_USERS',
     SET_SELECTED_POST = 'SET_SELECTED_POST',
-    // SET_SELECTED_COMMENTS = 'SET_SELECTED_COMMENTS',
+    SET_SELECTED_COMMENTS = 'SET_SELECTED_COMMENTS',
     // SET_SELECTED_USER = 'SET_SELECTED_USER',
 }
 
@@ -29,7 +29,7 @@ type PostPayload = {
     [Types.SET_COMMENTS]: IComment[];
     [Types.SET_USERS]: IUser[];
     [Types.SET_SELECTED_POST]: IPost | number;
-    // [Types.SET_SELECTED_COMMENTS]: number;
+    [Types.SET_SELECTED_COMMENTS]: IComment[] | number;
     // [Types.SET_SELECTED_USER]: number;
 };
 
@@ -41,7 +41,7 @@ export type State = {
     users: IUser[];
     selectedPost: {
         post?: IPost;
-        // comments: IComment[];
+        comments?: IComment[];
         // author: IUser;
     };
 };
