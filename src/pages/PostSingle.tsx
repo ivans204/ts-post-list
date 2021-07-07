@@ -29,10 +29,10 @@ const PostSingle: FC = () => {
         { shouldFetch: !state.comments.length }
     );
 
-    const fetchedUser = useFetch(
-        `https://jsonplaceholder.typicode.com/users/${state.selectedPost.post?.userId}`,
+    const fetchedUsers = useFetch(
+        `https://jsonplaceholder.typicode.com/users`,
         {
-            shouldFetch: fetchedPost.status === 'success',
+            shouldFetch: !state.users.length,
         }
     );
 
@@ -57,14 +57,10 @@ const PostSingle: FC = () => {
             });
         }
 
-        if (
-            !state.selectedPost.author?.username &&
-            // state.selectedPost.post.userId &&
-            fetchedUser.status === 'success'
-        ) {
+        if (!state.users.length && fetchedUsers.status === 'success') {
             dispatch({
-                type: Types.SET_SELECTED_USER,
-                payload: fetchedUser.data as IUser,
+                type: Types.SET_USERS,
+                payload: fetchedUsers.data as IUser[],
             });
         }
 
@@ -78,8 +74,6 @@ const PostSingle: FC = () => {
         if (state.comments.length)
             dispatch({ type: Types.SET_SELECTED_COMMENTS, payload: +id });
 
-        console.log(state.selectedPost.post?.userId);
-
         if (state.users.length && state.selectedPost.post?.userId)
             dispatch({
                 type: Types.SET_SELECTED_USER,
@@ -87,6 +81,11 @@ const PostSingle: FC = () => {
             });
         //eslint-disable-next-line
     }, []);
+
+    const postAuthor = (userId: number): IUser | undefined => {
+        if (state.selectedPost.post?.userId)
+            return state.users.find((user) => user.id === userId) as IUser;
+    };
 
     if (
         fetchedPost.status === 'fetching' ||
@@ -100,7 +99,10 @@ const PostSingle: FC = () => {
                 title={state.selectedPost.post?.title}
                 body={state.selectedPost.post?.body}
                 comments={state.selectedPost.comments}
-                author={state.selectedPost.author?.username || 'author'}
+                author={
+                    postAuthor(state.selectedPost.post?.userId as number)
+                        ?.username
+                }
             />
             <Link to="/posts"> Posts </Link>
         </>

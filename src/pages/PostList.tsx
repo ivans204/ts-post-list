@@ -47,9 +47,8 @@ const PostList: FC = () => {
                 payload: users.data as IUser[],
             });
         }
-
-        // eslint-disable-next-line
-    });
+        //eslint-disable-next-line
+    }, [state, posts, comments, users]);
 
     const postComments = (id: number) =>
         state.comments.filter((comment) => comment.postId === id);
@@ -59,6 +58,10 @@ const PostList: FC = () => {
             state.posts &&
             (state.users.find((user) => user.id === userId) as IUser)
         );
+    };
+
+    const foo = (id: number) => {
+        console.log(id);
     };
 
     if (
@@ -82,6 +85,7 @@ const PostList: FC = () => {
                         href={`/post/${id}`}
                         comments={postComments(id)}
                         author={postAuthor(userId)?.username}
+                        onClick={() => foo(id)}
                     />
                 );
             })}
