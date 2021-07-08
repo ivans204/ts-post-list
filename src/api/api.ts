@@ -16,3 +16,12 @@ export const getComments = async (): Promise<IComment[]> =>
 
 export const getUsers = async (): Promise<IUser[]> =>
     await axios.get(`${baseUrl}/users`).then(responseBody);
+
+export const getPostById = async (id: number): Promise<IPost> =>
+    await axios.get(`${baseUrl}/posts/${id}`).then(responseBody);
+
+export const getUserByPostId = async (postId: number): Promise<IUser> =>
+    await axios.get(`${baseUrl}/users/${postId}`).then(responseBody);
+
+export const getCommentsById = async (id: number): Promise<IComment[]> =>
+    await axios.get(`${baseUrl}/comments?postId=${id}`).then(responseBody);
