@@ -1,77 +1,61 @@
-import { FC, useContext, useEffect } from 'react';
+import { FC } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
+import { IComment } from '../models/comment.model';
+import { IUser } from '../models/user.model';
+import { IPost } from '../models/post.model';
+
 import withMessage from 'hocs/withMessage';
 
-import { PostContext } from '../context/PostsContext';
 import PostItem from 'components/PostItem';
 
-import { getCommentsById, getPostById, getUserByPostId } from 'api/api';
+import { getPosts, getComments, getUsers } from '../api/api';
+
 import { useQuery } from 'react-query';
-import { Types } from 'models/context.model';
-import { IPost } from 'models/post.model';
 
 const PostSingle: FC = () => {
-    const { state, dispatch } = useContext(PostContext);
-    const { selectedPost, posts, comments, users } = state;
-
     const { id } = useParams<{ id: string }>();
 
     const {
-        isLoading: isPostLoading,
+        isLoading: isPostsLoading,
         isError: isPostError,
-        data: postData,
-    } = useQuery<IPost, Error>('selectedPost', () => getPostById(+id), {
-        enabled: !state.posts.length,
-        onSuccess: (data) =>
-            dispatch({ type: Types.SET_SELECTED_POST, payload: data }),
-    });
+        data: postsData,
+    } = useQuery<IPost[], Error>('posts', getPosts);
 
-    const { isLoading: isCommentsLoading, isError: isCommentsError } = useQuery(
-        'selectedComments',
-        () => getCommentsById(+id),
-        {
-            enabled: !state.comments.length,
-            onSuccess: (data) =>
-                dispatch({ type: Types.SET_SELECTED_COMMENTS, payload: data }),
-        }
-    );
+    const {
+        isLoading: isCommentsLoading,
+        isError: isCommentsError,
+        data: commentsData,
+    } = useQuery<IComment[], Error>('comments', getComments);
 
-    const { isLoading: isUserLoading, isError: isUserError } = useQuery(
-        'selectedUser',
-        () => getUserByPostId(postData?.userId as number),
-        {
-            enabled: !!postData?.userId && !state.users.length,
-            onSuccess: (data) =>
-                dispatch({ type: Types.SET_SELECTED_USER, payload: data }),
-        }
-    );
+    const {
+        isLoading: isUsersLoading,
+        isError: isUsersError,
+        data: usersData,
+    } = useQuery<IUser[], Error>('users', getUsers);
 
-    useEffect(() => {
-        if (posts.length && comments.length && users.length) {
-            dispatch({ type: Types.SET_SELECTED_POST, payload: +id });
-            dispatch({ type: Types.SET_SELECTED_COMMENTS, payload: +id });
-            dispatch({
-                type: Types.SET_SELECTED_USER,
-                payload: selectedPost.post?.userId,
-            });
-        }
-        // eslint-disable-next-line
-    }, [selectedPost.post?.userId]);
+    const post = () => postsData?.find((post) => post.id === +id);
 
-    if (isPostLoading || isUserLoading || isCommentsLoading)
+    const postComments = () =>
+        commentsData?.filter((comment) => comment.postId === +id);
+
+    const postAuthor = () =>
+        usersData?.find((user) => user.id === post()?.userId);
+
+    if (isPostsLoading || isUsersLoading || isCommentsLoading)
         return <h1>Loading...</h1>;
 
-    if (isPostError || isUserError || isCommentsError) return <h1>Error...</h1>;
+    if (isPostError || isUsersError || isCommentsError)
+        return <h1>Error...</h1>;
 
     return (
         <>
             <PostItem
-                title={selectedPost.post?.title}
-                body={selectedPost.post?.body}
-                comments={selectedPost.comments}
-                author={selectedPost.author?.username}
+                title={post()?.title}
+                body={post()?.body}
+                comments={postComments()}
+                author={postAuthor()?.username}
             />
             <Link to="/posts"> Posts </Link>
         </>
