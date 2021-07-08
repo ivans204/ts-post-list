@@ -45,8 +45,6 @@ const PostList: FC = () => {
         }
     );
 
-    console.log(state);
-
     const postComments = (id: number) =>
         state.comments.filter((comment) => comment.postId === id);
 
